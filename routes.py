@@ -91,14 +91,13 @@ async def update_movie(
 
 
 @router.post("/movies/{movie_id}/rate")
-async def rate_movie(
+def rate_movie(
     movie_id: int,
     value: int = Form(...),
     db: Session = Depends(get_db)
 ):
     if value < 1 or value > 10:
         raise HTTPException(status_code=400, detail="Rating must be 1-10")
-
 
     movie = crud.add_rating(db, user_id=1, movie_id=movie_id, value=value)
 

@@ -48,32 +48,28 @@ def get_movie_by_id(db: Session, movie_id: int):
 
 def add_rating(db: Session, user_id: int, movie_id: int, value: int):
 
-    existing = db.query(models.Rating).filter(
-        models.Rating.user_id == user_id,
-        models.Rating.movie_id == movie_id
-    ).first()
+    # ❗ ВСЕГДА СОЗДАЁМ НОВУЮ ОЦЕНКУ (не обновляем)
+    new_rating = models.Rating(
+        user_id=user_id,
+        movie_id=movie_id,
+        value=value
+    )
 
-    if existing:
-        existing.value = value
-    else:
-        new_rating = models.Rating(
-            user_id=user_id,
-            movie_id=movie_id,
-            value=value
-        )
-        db.add(new_rating)
-
+    db.add(new_rating)
     db.commit()
 
-
-    avg = db.query(func.avg(models.Rating.value))\
+    # 🔥 СЧИТАЕМ СРЕДНЕЕ ПО ВСЕМ ОЦЕНКАМ
+    avg_rating = db.query(func.avg(models.Rating.value))\
         .filter(models.Rating.movie_id == movie_id)\
         .scalar()
 
-    movie = get_movie_by_id(db, movie_id)
-    movie.rating = round(avg, 2)
+    # обновляем фильм
+    movie = db.query(models.Movie).filter(models.Movie.id == movie_id).first()
+
+    movie.rating = round(avg_rating, 2)
 
     db.commit()
+    db.refresh(movie)
 
     return movie
 

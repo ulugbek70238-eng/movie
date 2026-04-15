@@ -10,5 +10,5 @@ COPY . .
 
 CMD ["uvicorn", "main:app", "--reload", "--port", "8000", "--host", "0.0.0.0"]
 
-#docker build -t fastapi-app . ---собираем наш образ
-#docker run -p 8000:8000 fastapi-app ---запускаем наш образ
+#docker build -t movie-app . ---собираем наш образ
+#docker run -p 8000:8000 movie-app ---запускаем наш образ
